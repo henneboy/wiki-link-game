@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 namespace Wiki_Game
@@ -13,7 +14,23 @@ namespace Wiki_Game
     }
     public class Web
     {
-
+        private List<string> visited = new();
+        private Queue<string> unvisited = new();
+        public void Jump(string srcUrl, string dstUrl)
+        {
+            string[] links;
+            while (unvisited.Peek() != dstUrl)
+            {
+                links = HTMLParser(Code(unvisited.Dequeue()));
+                foreach (string link in links)
+                {
+                    if (!visited.Contains(link))
+                    {
+                        unvisited.Enqueue(link);
+                    }
+                }
+            }
+        }
         public static string Code(string Url)
         {
             HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(Url);
