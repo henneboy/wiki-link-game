@@ -26,5 +26,9 @@ namespace Wiki_Game
 
             return result;
         }
+        public static string[] HTMLParser(string rawHTML)
+        {
+
+        }
     }
 }
