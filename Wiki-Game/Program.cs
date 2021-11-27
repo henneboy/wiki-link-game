@@ -10,6 +10,7 @@ namespace Wiki_Game
         {
             string link = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             Console.WriteLine(Web.Code(link));
+            List<string> links;
         }
     }
     public class Web
@@ -18,7 +19,7 @@ namespace Wiki_Game
         private Queue<string> unvisited = new();
         public void Jump(string srcUrl, string dstUrl)
         {
-            string[] links;
+            List<string> links;
             while (unvisited.Peek() != dstUrl)
             {
                 links = HTMLParser(Code(unvisited.Dequeue()));
@@ -43,9 +44,10 @@ namespace Wiki_Game
 
             return result;
         }
-        public static string[] HTMLParser(string rawHTML)
+        public static List<string> HTMLParser(string rawHTML)
         {
-
+            List<string> links = new();
+            return links;
         }
     }
 }
