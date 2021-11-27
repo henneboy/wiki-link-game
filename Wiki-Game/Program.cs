@@ -8,7 +8,7 @@ namespace Wiki_Game
         static void Main(string[] args)
         {
             string link = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
-            Console.WriteLine(HTMLReader.Code(link));
+            Console.WriteLine(Web.Code(link));
         }
     }
     public class Web
