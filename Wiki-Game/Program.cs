@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+
 namespace Wiki_Game
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             //Console.WriteLine(Web.Code(start));
@@ -18,15 +19,16 @@ namespace Wiki_Game
             //    Console.WriteLine(link);
             //}
             //Console.WriteLine(links.Count);
-
         }
     }
+
     public class Web
     {
         public const string hrefStr = @"href=""/wiki";
         public const string linkStr = @"https://en.wikipedia.org/wiki";
         private static List<string> visited = new();
         private static Queue<string> unvisited = new();
+
         public static void Jump(string srcUrl, string dstUrl)
         {
             // Format the src and dst links
@@ -38,7 +40,7 @@ namespace Wiki_Game
             while (unvisited.Peek() != dstUrl)
             {
                 visited.Add(unvisited.Peek());
-                links = HTMLParseForLinks(GetHTMLFromUrl(linkStr+unvisited.Dequeue()));
+                links = HTMLParseForLinks(GetHTMLFromUrl(linkStr + unvisited.Dequeue()));
                 foreach (string link in links)
                 {
                     if (!visited.Contains(link) || unvisited.Contains(link))
@@ -50,6 +52,7 @@ namespace Wiki_Game
             Console.WriteLine(unvisited.Peek());
             Console.WriteLine("Found it");
         }
+
         public static string GetHTMLFromUrl(string Url)
         {
             Console.WriteLine("Visiting: " + Url);
@@ -62,6 +65,7 @@ namespace Wiki_Game
             myResponse.Close();
             return result;
         }
+
         public static List<string> HTMLParseForLinks(string HTML)
         {
             List<string> links = new();
