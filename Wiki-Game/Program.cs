@@ -11,36 +11,46 @@ namespace Wiki_Game
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             //Console.WriteLine(Web.Code(start));
             List<string> links;
-            links = Web.HTMLParser(Web.Code(start));
-            foreach (string link in links)
-            {
-                Console.WriteLine(link);
-            }
+            Web.Jump("https://en.wikipedia.org/wiki/Apple", "https://en.wikipedia.org/wiki/Genome");
+            //links = Web.HTMLParseForLinks(Web.GetHTMLFromUrl(start));
+            //foreach (string link in links)
+            //{
+            //    Console.WriteLine(link);
+            //}
+            //Console.WriteLine(links.Count);
 
         }
     }
     public class Web
     {
-        private List<string> visited = new();
-        private Queue<string> unvisited = new();
-        public void Jump(string srcUrl, string dstUrl)
+        public const string hrefStr = @"href=""/wiki";
+        public const string linkStr = @"https://en.wikipedia.org/wiki";
+        private static List<string> visited = new();
+        private static Queue<string> unvisited = new();
+        public static void Jump(string srcUrl, string dstUrl)
         {
+            // Format the src and dst links
+            dstUrl = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length);
+            srcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
+            Console.WriteLine(dstUrl);
             List<string> links;
             unvisited.Enqueue(srcUrl);
             while (unvisited.Peek() != dstUrl)
             {
-                links = HTMLParser(Code(unvisited.Dequeue()));
+                visited.Add(unvisited.Peek());
+                links = HTMLParseForLinks(GetHTMLFromUrl(linkStr+unvisited.Dequeue()));
                 foreach (string link in links)
                 {
-                    if (!visited.Contains(link))
+                    if (!visited.Contains(link) || unvisited.Contains(link))
                     {
                         unvisited.Enqueue(link);
                     }
                 }
             }
+            Console.WriteLine(unvisited.Peek());
             Console.WriteLine("Found it");
         }
-        public static string Code(string Url)
+        public static string GetHTMLFromUrl(string Url)
         {
             Console.WriteLine("Visiting: " + Url);
             HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(Url);
@@ -52,43 +62,38 @@ namespace Wiki_Game
             myResponse.Close();
             return result;
         }
-        public static List<string> HTMLParser(string rawHTML)
+        public static List<string> HTMLParseForLinks(string HTML)
         {
             List<string> links = new();
-            const string hrefStr = @"href=""/wiki";
-            const string trashStart = hrefStr + @"/Special:SpecialPages";
-            const string trashEnd = hrefStr + @"bc-editpage";
-            // remove header
-            rawHTML = rawHTML.Substring(rawHTML.IndexOf("</head>")+7);
-            rawHTML = rawHTML.Substring(0, rawHTML.IndexOf("<footer"));
-            int trashIdx;
-            while ((trashIdx = rawHTML.IndexOf(trashStart)) != -1)
-            {
-                rawHTML=rawHTML.Remove(trashIdx, (rawHTML.IndexOf(trashEnd) - trashIdx));
-            }
-            // parse the links of the body 
-            Console.WriteLine("HrefStr: " + hrefStr);
+            HTML = HTMLRemoveHeaderAndFooter(HTML);
             int hrefIndex;
-            while (true)
+            int quoteMark;
+            string link;
+            do
             {
-                hrefIndex = -1;
-                rawHTML = rawHTML.Substring(rawHTML.IndexOf(hrefStr) + hrefStr.Length);
-                hrefIndex = rawHTML.IndexOf(@"""");
+                hrefIndex = HTML.IndexOf(hrefStr);
                 if (hrefIndex != -1)
                 {
-                    if (rawHTML[8] != '#')
+                    HTML = HTML.Substring(HTML.IndexOf(hrefStr) + hrefStr.Length);
+                    quoteMark = HTML.IndexOf(@"""");
+                    link = HTML.Substring(0, quoteMark);
+                    if (HTML[8] != '#' && !links.Contains(link))
                     {
-                        links.Add(rawHTML.Substring(0, hrefIndex));
-                        Console.WriteLine(rawHTML.Substring(0, hrefIndex));
+                        links.Add(HTML.Substring(0, quoteMark));
                     }
-                    rawHTML = rawHTML.Substring(hrefIndex);
+                    HTML = HTML.Substring(quoteMark);
                 }
-                else
-                {
-                    break;
-                }
-            }
+            } while (hrefIndex != -1);
             return links;
+        }
+
+        public static string HTMLRemoveHeaderAndFooter(string HTML)
+        {
+            string headerTag = @"</head>";
+            string footerTag = @"<footer";
+            HTML = HTML.Substring(HTML.IndexOf(headerTag) + headerTag.Length);
+            HTML = HTML.Substring(0, HTML.IndexOf(footerTag));
+            return HTML;
         }
     }
 }
