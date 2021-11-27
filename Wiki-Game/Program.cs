@@ -11,7 +11,7 @@ namespace Wiki_Game
             Console.WriteLine(HTMLReader.Code(link));
         }
     }
-    public class HTMLReader
+    public class Web
     {
 
         public static string Code(string Url)
