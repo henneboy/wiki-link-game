@@ -14,8 +14,12 @@ namespace Wiki_Game
             //string end = "https://en.wikipedia.org/wiki/Genome";
             string start = "https://en.wikipedia.org/wiki/Iron";
             string end = "https://en.wikipedia.org/wiki/X-ray_crystallography";
+            // without GetContentDiv:
             // 5626 pages
             // 2521 seconds
+            // with GetContentDiv:
+            // 5626 pages
+            // 557 seconds
             Stopwatch watch = new Stopwatch();
             watch.Start();
             int nrOfPagesVisited;
