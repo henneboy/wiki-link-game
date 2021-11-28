@@ -14,6 +14,8 @@ namespace Wiki_Game
             //string end = "https://en.wikipedia.org/wiki/Genome";
             string start = "https://en.wikipedia.org/wiki/Iron";
             string end = "https://en.wikipedia.org/wiki/X-ray_crystallography";
+            // 5626 pages
+            // 2521 seconds
             Stopwatch watch = new Stopwatch();
             watch.Start();
             int nrOfPagesVisited;
@@ -41,9 +43,12 @@ namespace Wiki_Game
             unvisited.Enqueue(srcUrl);
             while (unvisited.Peek().ToLower() != dstUrl)
             {
-                visited.Add(unvisited.Peek().ToLower());
-                ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
-                nrOfPagesVisited++;
+                if (!visited.Contains(unvisited.Peek().ToLower()))
+                {
+                    visited.Add(unvisited.Peek().ToLower());
+                    ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
+                    nrOfPagesVisited++;
+                }
             }
             Console.WriteLine(unvisited.Peek());
             Console.WriteLine("Found it");
@@ -75,7 +80,7 @@ namespace Wiki_Game
                 {
                     quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
                     link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-                    if (IsNotWrongType(link) && !unvisited.Contains(link) && !visited.Contains(link.ToLower()))
+                    if (IsNotWrongType(link) && !visited.Contains(link.ToLower()))
                     {
                         unvisited.Enqueue(link);
                     }
