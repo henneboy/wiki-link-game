@@ -98,8 +98,9 @@ namespace Wiki_Game
 
         public static string GetContentDiv(string HTML)
         {
-            const string contentStartTag = @"<div="" id""mw-content";
-            const string contentEndTag = @"<div id=""mw-navigation";
+            const string contentStartTag = @"<div id=""mw-content-text";
+            //const string contentEndTag = @"<div id=""mw-navigation";
+            const string contentEndTag = @"<noscript>";
             int startIdx = HTML.IndexOf(contentStartTag) + contentStartTag.Length;
             int endIdx = HTML.IndexOf(contentEndTag, startIdx);
             HTML = HTML.Substring(startIdx, endIdx - startIdx);
