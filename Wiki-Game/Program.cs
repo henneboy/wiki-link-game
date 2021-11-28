@@ -10,15 +10,19 @@ namespace Wiki_Game
     {
         private static void Main(string[] args)
         {
-            string start = "https://en.wikipedia.org/wiki/Apple";
-            string end = "https://en.wikipedia.org/wiki/Genome";
+            //string start = "https://en.wikipedia.org/wiki/Apple";
+            //string end = "https://en.wikipedia.org/wiki/Genome";
+            string start = "https://en.wikipedia.org/wiki/Iron";
+            string end = "https://en.wikipedia.org/wiki/X-ray_crystallography";
             Stopwatch watch = new Stopwatch();
             watch.Start();
             int nrOfPagesVisited;
             WikiWeb.Jump(start, end, out nrOfPagesVisited);
             watch.Stop();
             string Time = watch.Elapsed.TotalSeconds.ToString();
-            Console.WriteLine("It took: " + Time + " seconds, af total of: " + nrOfPagesVisited + " pages have been visited");
+            Console.WriteLine("Traveled from: " + start + " to: " + end);
+            Console.WriteLine("It took: " + Time + " seconds");
+            Console.WriteLine(nrOfPagesVisited + " pages have been visited");
         }
     }
 
@@ -32,12 +36,12 @@ namespace Wiki_Game
             nrOfPagesVisited = 0;
             // Format the src and dst links
             const string linkStr = @"https://en.wikipedia.org/wiki/";
-            dstUrl = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length);
+            dstUrl = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
             srcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
             unvisited.Enqueue(srcUrl);
-            while (unvisited.Peek() != dstUrl)
+            while (unvisited.Peek().ToLower() != dstUrl)
             {
-                visited.Add(unvisited.Peek());
+                visited.Add(unvisited.Peek().ToLower());
                 ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
                 nrOfPagesVisited++;
             }
@@ -71,7 +75,7 @@ namespace Wiki_Game
                 {
                     quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
                     link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-                    if (!unvisited.Contains(link) && !visited.Contains(link) && !link.StartsWith("File:"))
+                    if (IsNotWrongType(link) && !unvisited.Contains(link) && !visited.Contains(link.ToLower()))
                     {
                         unvisited.Enqueue(link);
                     }
@@ -82,12 +86,20 @@ namespace Wiki_Game
 
         public static string GetContentDiv(string HTML)
         {
-            const string contentStartTag = @"<div=""bodyContent";
+            const string contentStartTag = @"<div="" id""mw-content";
             const string contentEndTag = @"<div id=""mw-navigation";
             int startIdx = HTML.IndexOf(contentStartTag) + contentStartTag.Length;
             int endIdx = HTML.IndexOf(contentEndTag, startIdx);
             HTML = HTML.Substring(startIdx, endIdx - startIdx);
             return HTML;
+        }
+        public static bool IsNotWrongType(string link)
+        {
+            if (link.StartsWith("File:") || link.StartsWith("Special:") || link.StartsWith("Template:") || link.StartsWith("Category:") || link.StartsWith("Wikipedia:"))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
