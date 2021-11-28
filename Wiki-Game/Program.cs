@@ -12,8 +12,10 @@ namespace Wiki_Game
         {
             //string start = "https://en.wikipedia.org/wiki/Apple";
             //string end = "https://en.wikipedia.org/wiki/Genome";
-            string start = "https://en.wikipedia.org/wiki/Iron";
-            string end = "https://en.wikipedia.org/wiki/X-ray_crystallography";
+            //string start = "https://en.wikipedia.org/wiki/Iron";
+            string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
+            //string end = "https://en.wikipedia.org/wiki/X-ray_crystallography";
+            string end = "https://en.wikipedia.org/wiki/Keyboard_layout";
             // without GetContentDiv:
             // 5626 pages
             // 2521 seconds
