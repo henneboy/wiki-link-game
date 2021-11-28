@@ -48,6 +48,9 @@ namespace Wiki_Game
                     visited.Add(unvisited.Peek().ToLower());
                     ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
                     nrOfPagesVisited++;
+                } else
+                {
+                    unvisited.Dequeue();
                 }
             }
             Console.WriteLine(unvisited.Peek());
