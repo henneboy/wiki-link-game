@@ -19,7 +19,7 @@ namespace Wiki_Game
             // 2521 seconds
             // with GetContentDiv:
             // 5626 pages
-            // 557 seconds
+            // 537 seconds
             Stopwatch watch = new Stopwatch();
             watch.Start();
             int nrOfPagesVisited;
