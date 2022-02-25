@@ -14,7 +14,7 @@ namespace Wiki_Game
         const string linkStr = @"https://en.wikipedia.org/wiki/";
         public static int AmountOfPagesVisited { get; set; } = 0;
         public static int AmountOfTasks { get; set; } = 1;
-        public static int MaxAmountOfTasks { get; } = 10;
+        public static int MaxAmountOfTasks { get; } = 50;
         public static string DestinationPage { get; set; } = "";
         public static string FoundDestination { get; set; }
         public static List<Task> Tasks = new();
@@ -26,23 +26,19 @@ namespace Wiki_Game
             Tasks.Add(Searcher(srcUrl));
             while (unvisited.Peek().ToLower() != DestinationPage)
             {
-                if (unvisited.Peek() != null && !visited.Contains(unvisited.Peek().ToLower()))
+                Console.CursorLeft = 100;
+                Console.Write(Tasks.Count);
+                Console.CursorLeft = 0;
+                if (AmountOfTasks < MaxAmountOfTasks)
                 {
-                    if (AmountOfTasks < MaxAmountOfTasks)
-                    {
-                        Tasks.Add(Task.Run(() => QueueSearcher(unvisited.Dequeue())));
-                        AmountOfTasks++;
-                    }
-                    Task finishedTask = await Task.WhenAny(Tasks);
-                    if (finishedTask != null)
-                    {
-                        Tasks.Remove(finishedTask);
-                        Tasks.Add(Searcher(unvisited.Dequeue()));
-                    }
+                    Tasks.Add(Task.Run(() => Searcher(unvisited.Dequeue())));
+                    AmountOfTasks++;
                 }
-                else
+                Task finishedTask = await Task.WhenAny(Tasks);
+                if (finishedTask != null)
                 {
-                    unvisited.Dequeue();
+                    Tasks.Remove(finishedTask);
+                    Tasks.Add(Searcher(unvisited.Dequeue()));
                 }
             }
             Tasks.ForEach(t => t.Dispose());
@@ -55,10 +51,13 @@ namespace Wiki_Game
             visited.Add(srcUrl.ToLower(), unvisited.Peek().ToLower());
             // With GetContentDiv:
             //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
-            foreach (string link in ParseLinksFromHTML(GetHTMLFromUrl(linkStr + srcUrl)))
-            {
-                unvisited.Enqueue(link);
-            }
+            await Task.Run(()=>
+            { 
+                foreach (string link in ParseLinksFromHTML(GetHTMLFromUrl(linkStr + srcUrl)))
+                {
+                    unvisited.Enqueue(link);
+                }
+            });
             AmountOfPagesVisited++;
         }
 
@@ -125,7 +124,7 @@ namespace Wiki_Game
         }
         public static bool IsNotWrongType(string link)
         {
-            if (link.StartsWith("File:") || link.StartsWith("Special:") || link.StartsWith("Template:") || link.StartsWith("Category:") || link.StartsWith("Wikipedia:"))
+            if (link.StartsWith("File:") || link.StartsWith("Special:") || link.StartsWith("Template:") || link.StartsWith("Category:") || link.StartsWith("Wikipedia:") || string.IsNullOrEmpty(link))
             {
                 return false;
             }

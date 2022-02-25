@@ -8,7 +8,7 @@ namespace Wiki_Game
         private static void Main(string[] args)
         {
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
-            string end = "https://en.wikipedia.org/wiki/Programming_paradigm";
+            string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
             // Without GetContentDiv
             // 12,8 sek
             // 131 pages
