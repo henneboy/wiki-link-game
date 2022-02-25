@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 
 namespace Wiki_Game
@@ -9,32 +10,60 @@ namespace Wiki_Game
     public static class WikiWeb
     {
         private static Hashtable visited = new();
-        private static Queue<string> unvisited = new();
+        const string linkStr = @"https://en.wikipedia.org/wiki/";
+        public static int AmountOfPagesVisited { get; set; } = 0;
+        public static int AmountOfThreads { get; set; } = 1;
+        public static int MaxAmountOfThreads { get; } = 10;
+        public static string DestinationPage { get; set; } = "";
+        public static string FoundDestination { get; set; }
 
-        public static void Jump(string srcUrl, string dstUrl, out int nrOfPagesVisited)
+        public static void QueueSearcher(string srcUrl)
         {
-            nrOfPagesVisited = 0;
-            // Format the src and dst links
-            const string linkStr = @"https://en.wikipedia.org/wiki/";
-            dstUrl = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
-            srcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
+            Queue<string> unvisited = new();
             unvisited.Enqueue(srcUrl);
-            while (unvisited.Peek().ToLower() != dstUrl)
+
+            while (unvisited.Peek().ToLower() != DestinationPage)
             {
                 if (!visited.Contains(unvisited.Peek().ToLower()))
                 {
                     visited.Add(unvisited.Peek().ToLower(), unvisited.Peek().ToLower());
                     // With GetContentDiv:
                     //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
-                    ParseHTMLForLinksAndEnqueue(GetHTMLFromUrl(linkStr + unvisited.Dequeue()));
-                    nrOfPagesVisited++;
-                } else
+                    foreach (string link in ParseLinksFromHTML(GetHTMLFromUrl(linkStr + unvisited.Dequeue())))
+                    {
+                        if (AmountOfThreads < MaxAmountOfThreads)
+                        {
+
+                            unvisited.Enqueue(link);
+                            //AmountOfThreads++;
+                            break;
+                        }
+                        unvisited.Enqueue(link);
+                    }
+                    AmountOfPagesVisited++;
+                }
+                else
                 {
                     unvisited.Dequeue();
                 }
             }
-            Console.WriteLine(unvisited.Peek());
+
+            FoundDestination = unvisited.Peek();
+            SearchComplete();
+        }
+
+        public static void SearchComplete()
+        {
+            Console.WriteLine("I found: " + FoundDestination);
             Console.WriteLine("Found it");
+        }
+
+        public static void SearchSetup(string srcUrl, string dstUrl)
+        {
+            // Format the src and dst links
+            DestinationPage = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
+            srcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
+            QueueSearcher(srcUrl);
         }
 
         public static string GetHTMLFromUrl(string Url)
@@ -50,29 +79,29 @@ namespace Wiki_Game
             return result;
         }
 
-        public static void ParseHTMLForLinksAndEnqueue(string HTML)
-        {
-            const string hrefStr = @"href=""/wiki/";
-            int hrefIndex = 0;
-            int quoteMark;
-            string link;
-            do
-            {
-                hrefIndex = HTML.IndexOf(hrefStr, hrefIndex);
-                if (hrefIndex != -1)
-                {
-                    quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
-                    link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-                    if (IsNotWrongType(link) && !visited.Contains(link.ToLower()))
-                    {
-                        unvisited.Enqueue(link);
-                    }
-                    hrefIndex = quoteMark;
-                }
-            } while (hrefIndex != -1);
-        }
+        //public static void ParseHTMLForLinksAndEnqueue(string HTML)
+        //{
+        //    const string hrefStr = @"href=""/wiki/";
+        //    int hrefIndex = 0;
+        //    int quoteMark;
+        //    string link;
+        //    do
+        //    {
+        //        hrefIndex = HTML.IndexOf(hrefStr, hrefIndex);
+        //        if (hrefIndex != -1)
+        //        {
+        //            quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
+        //            link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
+        //            if (IsNotWrongType(link) && !visited.Contains(link.ToLower()))
+        //            {
+        //                unvisited.Enqueue(link);
+        //            }
+        //            hrefIndex = quoteMark;
+        //        }
+        //    } while (hrefIndex != -1);
+        //}
 
-        public static ICollection<string> ParseLinksFromHTML(string HTML)
+        public static IEnumerable<string> ParseLinksFromHTML(string HTML)
         {
             ICollection<string> links = new List<string>();
             const string hrefStr = @"href=""/wiki/";
