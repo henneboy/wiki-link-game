@@ -8,13 +8,13 @@ namespace Wiki_Game
         private static void Main(string[] args)
         {
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
-            string end = "https://en.wikipedia.org/wiki/Keyboard_layout";
+            string end = "https://en.wikipedia.org/wiki/Programming_paradigm";
             // Without GetContentDiv
             // 12,8 sek
             // 131 pages
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            WikiWeb.Jump(start, end);
+            WikiWeb.DoSearch(start, end);
             watch.Stop();
             string Time = watch.Elapsed.TotalSeconds.ToString();
             Console.WriteLine("Traveled from: " + start + " to: " + end);

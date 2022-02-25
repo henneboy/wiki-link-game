@@ -17,41 +17,49 @@ namespace Wiki_Game
         public static int MaxAmountOfTasks { get; } = 10;
         public static string DestinationPage { get; set; } = "";
         public static string FoundDestination { get; set; }
-        public static List<Task> Tasks;
+        public static List<Task> Tasks = new();
         public static Queue<string> unvisited = new();
 
-        public static void QueueSearcher(string srcUrl)
+        public static async Task QueueSearcher(string srcUrl)
         {
-            //Queue<string> unvisited = new();
             unvisited.Enqueue(srcUrl);
-
+            Tasks.Add(Searcher(srcUrl));
             while (unvisited.Peek().ToLower() != DestinationPage)
             {
-                if (!visited.Contains(unvisited.Peek().ToLower()))
+                if (unvisited.Peek() != null && !visited.Contains(unvisited.Peek().ToLower()))
                 {
-                    visited.Add(unvisited.Peek().ToLower(), unvisited.Peek().ToLower());
-                    // With GetContentDiv:
-                    //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
-                    foreach (string link in ParseLinksFromHTML(GetHTMLFromUrl(linkStr + unvisited.Dequeue())))
+                    if (AmountOfTasks < MaxAmountOfTasks)
                     {
-                        if (AmountOfTasks < MaxAmountOfTasks)
-                        {
-                            Tasks.Add(Task.Run(()=> QueueSearcher(link)));
-                            unvisited.Enqueue(link);
-                            AmountOfTasks++;
-                            break;
-                        }
-                        unvisited.Enqueue(link);
+                        Tasks.Add(Task.Run(() => QueueSearcher(unvisited.Dequeue())));
+                        AmountOfTasks++;
                     }
-                    AmountOfPagesVisited++;
+                    Task finishedTask = await Task.WhenAny(Tasks);
+                    if (finishedTask != null)
+                    {
+                        Tasks.Remove(finishedTask);
+                        Tasks.Add(Searcher(unvisited.Dequeue()));
+                    }
                 }
                 else
                 {
                     unvisited.Dequeue();
                 }
             }
+            Tasks.ForEach(t => t.Dispose());
             FoundDestination = unvisited.Peek();
             SearchComplete();
+        }
+
+        public static async Task Searcher(string srcUrl)
+        {
+            visited.Add(srcUrl.ToLower(), unvisited.Peek().ToLower());
+            // With GetContentDiv:
+            //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
+            foreach (string link in ParseLinksFromHTML(GetHTMLFromUrl(linkStr + srcUrl)))
+            {
+                unvisited.Enqueue(link);
+            }
+            AmountOfPagesVisited++;
         }
 
         public static void SearchComplete()
@@ -60,7 +68,7 @@ namespace Wiki_Game
             Console.WriteLine("Found it");
         }
 
-        public static void SearchSetup(string srcUrl, string dstUrl)
+        public static void DoSearch(string srcUrl, string dstUrl)
         {
             // Format the src and dst links
             DestinationPage = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
