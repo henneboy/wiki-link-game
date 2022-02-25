@@ -4,22 +4,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Wiki_Game
 {
-    public static class WikiWeb
+    public class WikiWeb
     {
         private static Hashtable visited = new();
         const string linkStr = @"https://en.wikipedia.org/wiki/";
         public static int AmountOfPagesVisited { get; set; } = 0;
-        public static int AmountOfThreads { get; set; } = 1;
-        public static int MaxAmountOfThreads { get; } = 10;
+        public static int AmountOfTasks { get; set; } = 1;
+        public static int MaxAmountOfTasks { get; } = 10;
         public static string DestinationPage { get; set; } = "";
         public static string FoundDestination { get; set; }
+        public static List<Task> Tasks;
+        public static Queue<string> unvisited = new();
 
         public static void QueueSearcher(string srcUrl)
         {
-            Queue<string> unvisited = new();
+            //Queue<string> unvisited = new();
             unvisited.Enqueue(srcUrl);
 
             while (unvisited.Peek().ToLower() != DestinationPage)
@@ -31,11 +34,11 @@ namespace Wiki_Game
                     //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
                     foreach (string link in ParseLinksFromHTML(GetHTMLFromUrl(linkStr + unvisited.Dequeue())))
                     {
-                        if (AmountOfThreads < MaxAmountOfThreads)
+                        if (AmountOfTasks < MaxAmountOfTasks)
                         {
-
+                            Tasks.Add(Task.Run(()=> QueueSearcher(link)));
                             unvisited.Enqueue(link);
-                            //AmountOfThreads++;
+                            AmountOfTasks++;
                             break;
                         }
                         unvisited.Enqueue(link);
@@ -47,7 +50,6 @@ namespace Wiki_Game
                     unvisited.Dequeue();
                 }
             }
-
             FoundDestination = unvisited.Peek();
             SearchComplete();
         }
@@ -78,28 +80,6 @@ namespace Wiki_Game
             myResponse.Close();
             return result;
         }
-
-        //public static void ParseHTMLForLinksAndEnqueue(string HTML)
-        //{
-        //    const string hrefStr = @"href=""/wiki/";
-        //    int hrefIndex = 0;
-        //    int quoteMark;
-        //    string link;
-        //    do
-        //    {
-        //        hrefIndex = HTML.IndexOf(hrefStr, hrefIndex);
-        //        if (hrefIndex != -1)
-        //        {
-        //            quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
-        //            link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-        //            if (IsNotWrongType(link) && !visited.Contains(link.ToLower()))
-        //            {
-        //                unvisited.Enqueue(link);
-        //            }
-        //            hrefIndex = quoteMark;
-        //        }
-        //    } while (hrefIndex != -1);
-        //}
 
         public static IEnumerable<string> ParseLinksFromHTML(string HTML)
         {
