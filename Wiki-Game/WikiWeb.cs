@@ -97,7 +97,7 @@ namespace Wiki_Game
                 {
                     quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
                     link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-                    if (!IsWrongType(link) && !visited.Contains(link.ToLower()))
+                    if (ValidLink(link) && !visited.Contains(link.ToLower()))
                     {
                         links.Add(link);
                     }
@@ -117,13 +117,13 @@ namespace Wiki_Game
             HTML = HTML.Substring(startIdx, endIdx - startIdx);
             return HTML;
         }
-        public static bool IsWrongType(string link)
+        public static bool ValidLink(string link)
         {
             if (link.StartsWith("File:") || link.StartsWith("Special:") || link.StartsWith("Template:") || link.StartsWith("Category:") || link.StartsWith("Wikipedia:") || string.IsNullOrEmpty(link))
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
     }
 }
