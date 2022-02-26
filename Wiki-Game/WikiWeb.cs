@@ -20,6 +20,14 @@ namespace Wiki_Game
         public static Task[] Tasks = new Task[MaxAmountOfTasks];
         public static Queue<string> unvisited = new();
 
+        public static void DoSearch(string srcUrl, string dstUrl)
+        {
+            // Format the src and dst links
+            DestinationPage = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
+            srcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
+            QueueSearcher(srcUrl);
+        }
+
         public static async Task QueueSearcher(string srcUrl)
         {
             unvisited.Enqueue(srcUrl);
@@ -48,7 +56,7 @@ namespace Wiki_Game
             //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
             await Task.Run(()=>
             { 
-                foreach (string link in ParseLinksFromHTML(GetHTMLFromUrl(linkStr + srcUrl)))
+                foreach (string link in WikiHTML.GetLinksFromUrl(linkStr + srcUrl))
                 {
                     unvisited.Enqueue(link);
                 }
@@ -60,70 +68,6 @@ namespace Wiki_Game
         {
             Console.WriteLine("I found: " + FoundDestination);
             Console.WriteLine("Found it");
-        }
-
-        public static void DoSearch(string srcUrl, string dstUrl)
-        {
-            // Format the src and dst links
-            DestinationPage = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
-            srcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
-            QueueSearcher(srcUrl);
-        }
-
-        public static string GetHTMLFromUrl(string Url)
-        {
-            Console.WriteLine("Reading: " + Url);
-            HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(Url);
-            myRequest.Method = "GET";
-            WebResponse myResponse = myRequest.GetResponse();
-            StreamReader sr = new StreamReader(myResponse.GetResponseStream(), System.Text.Encoding.UTF8);
-            string result = sr.ReadToEnd();
-            sr.Close();
-            myResponse.Close();
-            return result;
-        }
-
-        public static IEnumerable<string> ParseLinksFromHTML(string HTML)
-        {
-            ICollection<string> links = new List<string>();
-            const string hrefStr = @"href=""/wiki/";
-            int hrefIndex = 0;
-            int quoteMark;
-            string link;
-            do
-            {
-                hrefIndex = HTML.IndexOf(hrefStr, hrefIndex);
-                if (hrefIndex != -1)
-                {
-                    quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
-                    link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-                    if (ValidLink(link) && !visited.Contains(link.ToLower()))
-                    {
-                        links.Add(link);
-                    }
-                    hrefIndex = quoteMark;
-                }
-            } while (hrefIndex != -1);
-            return links;
-        }
-
-        public static string GetContentDiv(string HTML)
-        {
-            const string contentStartTag = @"<div id=""mw-content-text";
-            //const string contentEndTag = @"<div id=""mw-navigation";
-            const string contentEndTag = @"<noscript>";
-            int startIdx = HTML.IndexOf(contentStartTag) + contentStartTag.Length;
-            int endIdx = HTML.IndexOf(contentEndTag, startIdx);
-            HTML = HTML.Substring(startIdx, endIdx - startIdx);
-            return HTML;
-        }
-        public static bool ValidLink(string link)
-        {
-            if (link.StartsWith("File:") || link.StartsWith("Special:") || link.StartsWith("Template:") || link.StartsWith("Category:") || link.StartsWith("Wikipedia:") || string.IsNullOrEmpty(link))
-            {
-                return false;
-            }
-            return true;
         }
     }
 }
