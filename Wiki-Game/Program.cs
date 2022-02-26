@@ -14,12 +14,17 @@ namespace Wiki_Game
             // 131 pages
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            WikiWeb.DoSearch(start, end);
+            //WikiWeb.DoSearch(start, end);
             watch.Stop();
             string Time = watch.Elapsed.TotalSeconds.ToString();
             Console.WriteLine("Traveled from: " + start + " to: " + end);
             Console.WriteLine("It took: " + Time + " seconds");
             Console.WriteLine(WikiWeb.AmountOfPagesVisited + " pages have been visited");
+                Console.WriteLine("items");
+            foreach (var item in WikiWeb.ParseLinksFromHTML(start))
+            {
+                Console.WriteLine(item);
+            }
         }
     }
 }

@@ -10,38 +10,33 @@ namespace Wiki_Game
 {
     public class WikiWeb
     {
-        private static Hashtable visited = new();
+        public static Hashtable visited = new();
         const string linkStr = @"https://en.wikipedia.org/wiki/";
         public static int AmountOfPagesVisited { get; set; } = 0;
-        public static int AmountOfTasks { get; set; } = 1;
+        public static int AmountOfTasks { get; set; } = 0;
         public static int MaxAmountOfTasks { get; } = 50;
         public static string DestinationPage { get; set; } = "";
         public static string FoundDestination { get; set; }
-        public static List<Task> Tasks = new();
+        public static Task[] Tasks = new Task[MaxAmountOfTasks];
         public static Queue<string> unvisited = new();
 
         public static async Task QueueSearcher(string srcUrl)
         {
             unvisited.Enqueue(srcUrl);
-            Tasks.Add(Searcher(srcUrl));
+            Tasks[AmountOfTasks++] = Searcher(srcUrl);
             while (unvisited.Peek().ToLower() != DestinationPage)
             {
                 Console.CursorLeft = 100;
-                Console.Write(Tasks.Count);
+                Console.Write(Tasks.Where(t=>t != null).Count());
                 Console.CursorLeft = 0;
                 if (AmountOfTasks < MaxAmountOfTasks)
                 {
-                    Tasks.Add(Task.Run(() => Searcher(unvisited.Dequeue())));
+                    Tasks[AmountOfTasks++] = Task.Run(() => Searcher(unvisited.Dequeue()));
                     AmountOfTasks++;
                 }
-                Task finishedTask = await Task.WhenAny(Tasks);
-                if (finishedTask != null)
-                {
-                    Tasks.Remove(finishedTask);
-                    Tasks.Add(Searcher(unvisited.Dequeue()));
-                }
+                int IdxOffinishedTask = Task.WaitAny(Tasks);
+                Tasks[IdxOffinishedTask] = Searcher(unvisited.Dequeue());
             }
-            Tasks.ForEach(t => t.Dispose());
             FoundDestination = unvisited.Peek();
             SearchComplete();
         }
@@ -102,7 +97,7 @@ namespace Wiki_Game
                 {
                     quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
                     link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-                    if (IsNotWrongType(link) && !visited.Contains(link.ToLower()))
+                    if (!IsWrongType(link) && !visited.Contains(link.ToLower()))
                     {
                         links.Add(link);
                     }
@@ -122,13 +117,13 @@ namespace Wiki_Game
             HTML = HTML.Substring(startIdx, endIdx - startIdx);
             return HTML;
         }
-        public static bool IsNotWrongType(string link)
+        public static bool IsWrongType(string link)
         {
             if (link.StartsWith("File:") || link.StartsWith("Special:") || link.StartsWith("Template:") || link.StartsWith("Category:") || link.StartsWith("Wikipedia:") || string.IsNullOrEmpty(link))
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
     }
 }
