@@ -37,7 +37,7 @@ namespace Wiki_Game
                 {
                     quoteMark = HTML.IndexOf(@"""", hrefIndex + hrefStr.Length);
                     link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
-                    if (ValidLink(link)) //  && !visited.Contains(link.ToLower()
+                    if (ValidLink(link))
                     {
                         links.Add(link);
                     }

@@ -6,7 +6,7 @@ namespace Wiki_Game
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        public static async void Main(string[] args)
         {
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
@@ -15,10 +15,11 @@ namespace Wiki_Game
             // 131 pages
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            WikiWeb.DoSearch(start, end);
+            string found = await WikiWeb.DoSearch(start, end);
             watch.Stop();
             string Time = watch.Elapsed.TotalSeconds.ToString();
             Console.WriteLine("Traveled from: " + start + " to: " + end);
+            Console.WriteLine("The found site was: " + found);
             Console.WriteLine("It took: " + Time + " seconds");
             Console.WriteLine(WikiWeb.AmountOfPagesVisited + " pages have been visited");
             //Console.WriteLine("items");

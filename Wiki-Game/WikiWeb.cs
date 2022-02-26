@@ -20,22 +20,23 @@ namespace Wiki_Game
         public static Task[] Tasks = new Task[MaxAmountOfTasks];
         public static Queue<string> unvisited = new();
 
-        public static void DoSearch(string srcUrl, string dstUrl)
+        public static async Task<string> DoSearch(string srcUrl, string dstUrl)
         {
             // Format the src and dst links
             DestinationPage = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
             srcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
-            QueueSearcher(srcUrl);
+            string s = await QueueSearcher(srcUrl);
+            return s;
         }
 
-        public static async Task QueueSearcher(string srcUrl)
+        public static async Task<string> QueueSearcher(string srcUrl)
         {
             unvisited.Enqueue(srcUrl);
             Tasks[AmountOfTasks++] = Searcher(srcUrl);
             while (unvisited.Peek().ToLower() != DestinationPage)
             {
                 Console.CursorLeft = 100;
-                Console.Write(Tasks.Where(t=>t != null).Count());
+                Console.Write(Tasks.Where(t => t != null).Count());
                 Console.CursorLeft = 0;
                 if (AmountOfTasks < MaxAmountOfTasks)
                 {
@@ -47,6 +48,7 @@ namespace Wiki_Game
             }
             FoundDestination = unvisited.Peek();
             SearchComplete();
+            return "";
         }
 
         public static async Task Searcher(string srcUrl)
@@ -54,11 +56,14 @@ namespace Wiki_Game
             visited.Add(srcUrl.ToLower(), unvisited.Peek().ToLower());
             // With GetContentDiv:
             //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
-            await Task.Run(()=>
-            { 
+            await Task.Run(() =>
+            {
                 foreach (string link in WikiHTML.GetLinksFromUrl(linkStr + srcUrl))
                 {
-                    unvisited.Enqueue(link);
+                    if (!visited.Contains(link.ToLower()))
+                    {
+                        unvisited.Enqueue(link);
+                    }
                 }
             });
             AmountOfPagesVisited++;
