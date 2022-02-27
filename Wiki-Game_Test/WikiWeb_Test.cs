@@ -56,8 +56,22 @@ namespace Wiki_Game_Test
             string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
             WikiController wc = new WikiController(start, end);
             wc.Unvisited.Enqueue(start);
-            wc.Searcher().GetAwaiter().GetResult();
-            Assert.True(wc.Visited.ContainsValue(start));
+            wc.Searcher(wc.NextLink()).GetAwaiter().GetResult();
+            Assert.True(wc.Visited.ContainsValue(start.ToLower()));
+            Assert.True(wc.AmountOfPagesVisited == 1);
+            Assert.NotEmpty(wc.Unvisited);
+        }
+
+        [Fact]
+        public void SearchSetup_Test()
+        {
+            string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
+            string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
+            WikiController wc = new WikiController(start, end);
+            wc.SearchSetup().GetAwaiter().GetResult();
+            Assert.True(wc.Visited.ContainsValue(start.ToLower()));
+            Assert.True(wc.AmountOfPagesVisited == 1);
+            Assert.NotEmpty(wc.Unvisited);
         }
     }
 }

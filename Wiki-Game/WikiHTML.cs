@@ -12,7 +12,6 @@ namespace Wiki_Game
 
         public static string GetHTMLFromUrl(string Url)
         {
-            Console.CursorLeft = 0;
             Console.WriteLine("Reading: " + Url);
             HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(Url);
             myRequest.Method = "GET";

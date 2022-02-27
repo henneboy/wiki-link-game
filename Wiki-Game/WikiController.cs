@@ -9,6 +9,8 @@ namespace Wiki_Game
 {
     public class WikiController
     {
+        public string SrcUrl { get; }
+        public string DstUrl { get; }
         public static readonly string linkStr = @"https://en.wikipedia.org/wiki/";
         public int AmountOfPagesVisited { get; set; } = 0;
         public int AmountOfTasks { get; set; } = 0;
@@ -19,9 +21,8 @@ namespace Wiki_Game
 
         public WikiController(string srcUrl, string dstUrl)
         {
-            // Format the src and dst links
-            DstUrl = dstUrl.Substring(dstUrl.IndexOf(linkStr) + linkStr.Length).ToLower();
-            SrcUrl = srcUrl.Substring(srcUrl.IndexOf(linkStr) + linkStr.Length);
+            DstUrl = dstUrl;
+            SrcUrl = srcUrl;
         }
 
         public async Task<string> Starter()
@@ -29,48 +30,65 @@ namespace Wiki_Game
             return await StartSearch();
         }
 
-        public async Task<string> StartSearch()
+        public async Task SearchSetup()
         {
             Unvisited.Enqueue(SrcUrl);
-            Tasks.Add(Searcher());
-            await Tasks[AmountOfTasks];
+            Tasks.Add(Task.Run(()=>Searcher(NextLink())));
+            await Tasks.First();
+        }
+
+        public async Task<string> StartSearch()
+        {
+            await SearchSetup();
             await Task.Run(() =>
             {
                 while (Unvisited.Peek().ToLower() != DstUrl)
                 {
-                    Console.CursorLeft = 100;
-                    Console.Write(Tasks.Count);
-                    if (AmountOfTasks < MaxAmountOfTasks)
+                    Console.WriteLine(Tasks.Count);
+                    while (true)
                     {
-                        Tasks.Add(Task.Run(() => Searcher()));
-                        AmountOfTasks++;
+                        if (AmountOfTasks < MaxAmountOfTasks && Unvisited.Count != 0)
+                        {
+                            Tasks.Add(Task.Run(() => Searcher(NextLink())));
+                            AmountOfTasks++;
+                        }
+                        if (AmountOfTasks >= MaxAmountOfTasks)
+                        {
+                            break;
+                        }
                     }
                     int IdxOffinishedTask = Task.WaitAny(Tasks.ToArray());
-                    Tasks[IdxOffinishedTask] = Searcher();
+                    Tasks[IdxOffinishedTask] = Task.Run(() => Searcher(NextLink()));
                 }
             });
             return Unvisited.Peek();
         }
 
-        public async Task Searcher()
+        public string NextLink()
         {
             Visited.Add(Unvisited.Peek().ToLower(), Unvisited.Peek().ToLower());
+            return Unvisited.Dequeue();
+        }
+
+        public async Task Searcher(string link)
+        {
             // With GetContentDiv:
             //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
             await Task.Run(() =>
             {
-                foreach (string link in WikiHTML.GetLinksFromUrl(Unvisited.Dequeue().ToLower()))
+                string[] links = WikiHTML.GetLinksFromUrl(link).ToArray();
+                if (links.Length != 0)
                 {
-                    if (!Visited.Contains(link.ToLower()))
+                    foreach (string link in links)
                     {
-                        Unvisited.Enqueue(link);
+                        if (!Visited.Contains(link.ToLower()))
+                        {
+                            Unvisited.Enqueue(link);
+                        }
                     }
                 }
             });
             AmountOfPagesVisited++;
         }
-
-        public string SrcUrl { get; }
-        public string DstUrl { get; }
     }
 }
