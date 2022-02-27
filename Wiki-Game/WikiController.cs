@@ -16,7 +16,8 @@ namespace Wiki_Game
         public int AmountOfTasks { get; set; } = 0;
         public int MaxAmountOfTasks { get; } = 50;
         public List<Task> Tasks = new ();
-        public Hashtable Visited = new();
+        //public Hashtable Visited = new();
+        public List<string> Visited = new();
         public Queue<string> Unvisited = new();
 
         public WikiController(string srcUrl, string dstUrl)
@@ -68,7 +69,7 @@ namespace Wiki_Game
 
         public string NextLink()
         {
-            Visited.Add(Unvisited.Peek().ToLower(), Unvisited.Peek().ToLower());
+            Visited.Add(Unvisited.Peek().ToLower());
             return Unvisited.Dequeue();
         }
 
