@@ -10,7 +10,8 @@ namespace Wiki_Game
         public static void Main(string[] args)
         {
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
-            string end = "https://en.wikipedia.org/wiki/Generic_programming";
+            //string end = "https://en.wikipedia.org/wiki/Generic_programming";
+            string end = "https://en.wikipedia.org/wiki/Plug-in_(computing)";
             // Without GetContentDiv
             // 12,8 sek
             // 131 pages

@@ -57,7 +57,7 @@ namespace Wiki_Game_Test
             WikiController wc = new WikiController(start, end);
             wc.Unvisited.Enqueue(start);
             wc.Searcher(wc.NextLink()).GetAwaiter().GetResult();
-            Assert.Contains(start.ToLower(), wc.Visited);
+            Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited == 1);
             Assert.NotEmpty(wc.Unvisited);
         }
@@ -69,7 +69,7 @@ namespace Wiki_Game_Test
             string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
             WikiController wc = new WikiController(start, end);
             wc.SearchSetup().GetAwaiter().GetResult();
-            Assert.Contains(start.ToLower(), wc.Visited);
+            Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited == 1);
             Assert.NotEmpty(wc.Unvisited);
             Assert.Contains(@"https://en.wikipedia.org/wiki/Free_and_open-source_software", wc.Unvisited);

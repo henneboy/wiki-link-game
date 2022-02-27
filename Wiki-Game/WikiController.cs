@@ -68,7 +68,7 @@ namespace Wiki_Game
 
         public string NextLink()
         {
-            Visited.Add(Unvisited.Peek().ToLower(), Unvisited.Peek().ToLower());
+            Visited.Add(Unvisited.Peek().ToLower().GetHashCode(), Unvisited.Peek().ToLower());
             return Unvisited.Dequeue();
         }
 
@@ -83,7 +83,8 @@ namespace Wiki_Game
                 {
                     foreach (string link in links)
                     {
-                        if (!Visited.Contains(link.ToLower()))
+                        //if (!Visited.Contains(link.ToLower().GetHashCode()))
+                        if (Visited[link.ToLower().GetHashCode()] != null)
                         {
                             Unvisited.Enqueue(link);
                         }
