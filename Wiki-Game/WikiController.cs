@@ -47,7 +47,6 @@ namespace Wiki_Game
                 {
                     Console.WriteLine(Visited.Count);
                     Console.WriteLine(Unvisited.Count);
-                    Console.WriteLine(Unvisited.Peek());
                     //while (true)
                     //{
                     //    if (AmountOfTasks < MaxAmountOfTasks && Unvisited.Count != 0)
