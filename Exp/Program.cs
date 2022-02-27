@@ -7,9 +7,22 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Wiki_Game
+namespace Exp
 {
-    public class Tester
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+            string s = "not";
+            //s = Tester.idk("xd").GetAwaiter().GetResult();
+            s = Tester.idk("xd").GetAwaiter().GetResult();
+            Console.WriteLine(s);
+            Console.WriteLine("Hello World!");
+        }
+    }
+
+    public static class Tester
     {
         public static async Task<string> idk(string s)
         {
@@ -25,5 +38,4 @@ namespace Wiki_Game
             });
         }
     }
-
 }
