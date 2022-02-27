@@ -21,12 +21,13 @@ namespace Wiki_Game
 
         public WikiController(string srcUrl, string dstUrl)
         {
-            DstUrl = dstUrl;
+            DstUrl = dstUrl.ToLower();
             SrcUrl = srcUrl;
         }
 
         public async Task<string> Starter()
         {
+            await SearchSetup();
             return await StartSearch();
         }
 
@@ -39,24 +40,25 @@ namespace Wiki_Game
 
         public async Task<string> StartSearch()
         {
-            await SearchSetup();
             await Task.Run(() =>
             {
                 while (Unvisited.Peek().ToLower() != DstUrl)
                 {
-                    Console.WriteLine(Tasks.Count);
-                    while (true)
-                    {
-                        if (AmountOfTasks < MaxAmountOfTasks && Unvisited.Count != 0)
-                        {
-                            Tasks.Add(Task.Run(() => Searcher(NextLink())));
-                            AmountOfTasks++;
-                        }
-                        if (AmountOfTasks >= MaxAmountOfTasks)
-                        {
-                            break;
-                        }
-                    }
+                    Console.WriteLine(Visited.Count);
+                    Console.WriteLine(Unvisited.Count);
+                    Console.WriteLine(Unvisited.Peek());
+                    //while (true)
+                    //{
+                    //    if (AmountOfTasks < MaxAmountOfTasks && Unvisited.Count != 0)
+                    //    {
+                    //        Tasks.Add(Task.Run(() => Searcher(NextLink())));
+                    //        AmountOfTasks++;
+                    //    }
+                    //    if (AmountOfTasks >= MaxAmountOfTasks)
+                    //    {
+                    //        break;
+                    //    }
+                    //}
                     int IdxOffinishedTask = Task.WaitAny(Tasks.ToArray());
                     Tasks[IdxOffinishedTask] = Task.Run(() => Searcher(NextLink()));
                 }

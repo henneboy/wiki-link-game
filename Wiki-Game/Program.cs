@@ -17,7 +17,7 @@ namespace Wiki_Game
             Stopwatch watch = new Stopwatch();
             watch.Start();
             WikiController WC = new WikiController(start, end);
-            string found = WC.StartSearch().GetAwaiter().GetResult(); 
+            string found = WC.Starter().GetAwaiter().GetResult(); 
             //string found = WikiWeb.DoSearch(start, end).Result;
             watch.Stop();
             string Time = watch.Elapsed.TotalSeconds.ToString();

@@ -7,8 +7,10 @@ namespace Wiki_Game
 {
     public static class WikiHTML
     {
-        public static IEnumerable<string> GetLinksFromUrl(string Url) => ParseLinksFromHTML(GetHTMLFromUrl(Url));
+        public static readonly string hrefStr = @"href=""/wiki/";
+        public static readonly string WikiLinkPrefix = @"https://en.wikipedia.org/wiki/";
 
+        public static IEnumerable<string> GetLinksFromUrl(string Url) => ParseLinksFromHTML(GetHTMLFromUrl(Url));
 
         public static string GetHTMLFromUrl(string Url)
         {
@@ -26,7 +28,6 @@ namespace Wiki_Game
         public static IEnumerable<string> ParseLinksFromHTML(string HTML)
         {
             ICollection<string> links = new List<string>();
-            const string hrefStr = @"href=""/wiki/";
             int hrefIndex = 0;
             int quoteMark;
             string link;
@@ -39,7 +40,7 @@ namespace Wiki_Game
                     link = HTML.Substring(hrefIndex + hrefStr.Length, quoteMark - (hrefIndex + hrefStr.Length));
                     if (ValidLink(link))
                     {
-                        links.Add(link);
+                        links.Add(WikiLinkPrefix + link);
                     }
                     hrefIndex = quoteMark;
                 }

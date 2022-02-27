@@ -15,7 +15,7 @@ namespace Wiki_Game_Test
             Assert.NotNull(s);
             Assert.NotEmpty(s);
             string partOfPage = @"<a href=""/wiki/Declarative_programming"" title=""Declarative programming"">declarative</a>";
-            //Assert.Contains(partOfPage, s);
+            Assert.Contains(partOfPage, s);
         }
 
         [Fact]
@@ -26,8 +26,8 @@ namespace Wiki_Game_Test
             string[] links = WikiHTML.ParseLinksFromHTML(s).ToArray();
             Assert.NotNull(links);
             Assert.NotEmpty(links);
-            Assert.Contains(".NET_Framework", links);
-            Assert.Contains("Python_(programming_language)", links);
+            Assert.Contains(@"https://en.wikipedia.org/wiki/.NET_Framework", links);
+            Assert.Contains(@"https://en.wikipedia.org/wiki/Python_(programming_language)", links);
             foreach (var link in links)
             {
                 Assert.NotEmpty(link);
@@ -72,6 +72,7 @@ namespace Wiki_Game_Test
             Assert.True(wc.Visited.ContainsValue(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited == 1);
             Assert.NotEmpty(wc.Unvisited);
+            Assert.Contains(@"https://en.wikipedia.org/wiki/Free_and_open-source_software", wc.Unvisited);
         }
     }
 }
