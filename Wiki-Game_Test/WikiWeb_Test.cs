@@ -56,23 +56,36 @@ namespace Wiki_Game_Test
             string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
             WikiController wc = new WikiController(start, end);
             wc.Unvisited.Enqueue(start);
-            wc.Searcher(wc.NextLink()).GetAwaiter().GetResult();
+            wc.SearchLink(wc.NextLink());
             Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited == 1);
             Assert.NotEmpty(wc.Unvisited);
         }
 
         [Fact]
-        public void SearchSetup_Test()
+        public void Starter_1Task_Test()
         {
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
-            string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
-            WikiController wc = new WikiController(start, end);
-            wc.SearchSetup().GetAwaiter().GetResult();
+            string end = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
+            WikiController wc = new WikiController(start, end, 1);
+            wc.Starter().GetAwaiter().GetResult();
             Assert.True(wc.Visited.Contains(start.ToLower()));
-            Assert.True(wc.AmountOfPagesVisited == 1);
+            Assert.True(wc.AmountOfPagesVisited >= 1);
             Assert.NotEmpty(wc.Unvisited);
-            Assert.Contains(@"https://en.wikipedia.org/wiki/Free_and_open-source_software", wc.Unvisited);
+            Assert.Contains(end, wc.Unvisited);
+        }
+
+        [Fact]
+        public void Starter_50Tasks_Test()
+        {
+            string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
+            string end = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
+            WikiController wc = new WikiController(start, end, 50);
+            wc.Starter().GetAwaiter().GetResult();
+            Assert.True(wc.Visited.Contains(start.ToLower()));
+            Assert.True(wc.AmountOfPagesVisited >= 1);
+            Assert.NotEmpty(wc.Unvisited);
+            Assert.Contains(end, wc.Unvisited);
         }
 
         //[Fact]

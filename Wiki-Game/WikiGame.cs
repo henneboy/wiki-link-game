@@ -10,7 +10,7 @@ namespace Wiki_Game
             WikiController wc = new(startpage, endpage, AmountOfTasks);
             Stopwatch watch = new();
             watch.Start();
-            string res = wc.Starter().GetAwaiter().GetResult();
+            string res = wc.Starter().Result;
             watch.Stop();
             string time = watch.Elapsed.TotalSeconds.ToString();
             Console.WriteLine($"Found: {res} from the page {startpage}");

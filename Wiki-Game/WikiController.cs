@@ -11,58 +11,56 @@ namespace Wiki_Game
     {
         public string SrcUrl { get; }
         public string DstUrl { get; }
-        public static readonly string linkStr = @"https://en.wikipedia.org/wiki/";
         public int AmountOfPagesVisited { get; set; } = 0;
         private int AmountOfTasks { get; set; } = 0;
-        public int MaxAmountOfTasks { get; } = 50;
+        public int MaxAmountOfTasks { get; set; }
         public List<Task> Tasks = new ();
 //        public ILinkStorage Visited = new AList();
         public ILinkStorage Visited = new AHashSet();
         public Queue<string> Unvisited = new();
 
-        public WikiController(string srcUrl, string dstUrl)
+        public WikiController(string srcUrl, string dstUrl) : this(srcUrl, dstUrl, 1) { }
+
+        public WikiController(string srcUrl, string dstUrl, int maxAmountOfTasks)
         {
-            DstUrl = dstUrl.ToLower();
             SrcUrl = srcUrl;
+            DstUrl = dstUrl.ToLower();
+            MaxAmountOfTasks = maxAmountOfTasks;
         }
 
         public async Task<string> Starter()
         {
-            await SearchSetup();
-            return await StartSearch();
-        }
-
-        public async Task SearchSetup()
-        {
             Unvisited.Enqueue(SrcUrl);
-            Tasks.Add(Task.Run(()=>Searcher(NextLink())));
-            await Tasks.First();
+            while (Unvisited.Count < MaxAmountOfTasks)
+            {
+                if (NextInQueueIsDest())
+                {
+                    return Unvisited.Peek();
+                }
+                await Task.Run(() => SearchLink(NextLink()));
+            }
+            for (; AmountOfTasks < MaxAmountOfTasks; AmountOfTasks++)
+            {
+                if (NextInQueueIsDest())
+                {
+                    return Unvisited.Peek();
+                }
+                Tasks.Add(new Task(() => SearchLink(NextLink())));
+            }
+            Console.WriteLine("Trhoguhw");
+            return Search();
         }
 
-        public async Task<string> StartSearch()
+        public string Search()
         {
-            await Task.Run(() =>
+            Tasks.ForEach(t => t.Start());
+            while (Unvisited.Peek() == null && !NextInQueueIsDest() || !NextInQueueIsDest())
             {
-                while (Unvisited.Peek().ToLower() != DstUrl)
-                {
-                    Console.WriteLine(Visited.Count);
-                    Console.WriteLine(Unvisited.Count);
-                    //while (true)
-                    //{
-                    //    if (AmountOfTasks < MaxAmountOfTasks && Unvisited.Count != 0)
-                    //    {
-                    //        Tasks.Add(Task.Run(() => Searcher(NextLink())));
-                    //        AmountOfTasks++;
-                    //    }
-                    //    if (AmountOfTasks >= MaxAmountOfTasks)
-                    //    {
-                    //        break;
-                    //    }
-                    //}
-                    int IdxOffinishedTask = Task.WaitAny(Tasks.ToArray());
-                    Tasks[IdxOffinishedTask] = Task.Run(() => Searcher(NextLink()));
-                }
-            });
+                Console.WriteLine(Visited.Count);
+                Console.WriteLine(Unvisited.Count);
+                int IdxOffinishedTask = Task.WaitAny(Tasks.ToArray());
+                Tasks[IdxOffinishedTask] = Task.Run(() => SearchLink(NextLink()));
+            }
             return Unvisited.Peek();
         }
 
@@ -73,24 +71,23 @@ namespace Wiki_Game
             return Next;
         }
 
-        public async Task Searcher(string link)
+        public bool NextInQueueIsDest() => Unvisited.Peek() != null && Unvisited.Peek().ToLower() == DstUrl;
+
+        public void SearchLink(string SearchLink)
         {
             // With GetContentDiv:
             //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
-            await Task.Run(() =>
+            string[] links = WikiHTML.GetLinksFromUrl(SearchLink).ToArray();
+            if (links.Length != 0)
             {
-                string[] links = WikiHTML.GetLinksFromUrl(link).ToArray();
-                if (links.Length != 0)
+                foreach (string link in links)
                 {
-                    foreach (string link in links)
+                    if (!Visited.Contains(link.ToLower()))
                     {
-                        if (!Visited.Contains(link.ToLower()))
-                        {
-                            Unvisited.Enqueue(link);
-                        }
+                        Unvisited.Enqueue(link);
                     }
                 }
-            });
+            }
             AmountOfPagesVisited++;
         }
     }
