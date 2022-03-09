@@ -16,8 +16,7 @@ namespace Wiki_Game
         public int AmountOfTasks { get; set; } = 0;
         public int MaxAmountOfTasks { get; } = 50;
         public List<Task> Tasks = new ();
-        public Hashtable Visited = new();
-        //public List<string> Visited = new();
+        public HashSet<string> Visited = new();
         public Queue<string> Unvisited = new();
 
         public WikiController(string srcUrl, string dstUrl)
@@ -68,7 +67,7 @@ namespace Wiki_Game
 
         public string NextLink()
         {
-            Visited.Add(Unvisited.Peek().ToLower().GetHashCode(), Unvisited.Peek().ToLower());
+            Visited.Add(Unvisited.Peek().ToLower());
             return Unvisited.Dequeue();
         }
 
@@ -83,8 +82,7 @@ namespace Wiki_Game
                 {
                     foreach (string link in links)
                     {
-                        //if (!Visited.Contains(link.ToLower().GetHashCode()))
-                        if (Visited[link.ToLower().GetHashCode()] != null)
+                        if (!Visited.Contains(link.ToLower()))
                         {
                             Unvisited.Enqueue(link);
                         }
