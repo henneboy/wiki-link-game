@@ -13,10 +13,11 @@ namespace Wiki_Game
         public string DstUrl { get; }
         public static readonly string linkStr = @"https://en.wikipedia.org/wiki/";
         public int AmountOfPagesVisited { get; set; } = 0;
-        public int AmountOfTasks { get; set; } = 0;
+        private int AmountOfTasks { get; set; } = 0;
         public int MaxAmountOfTasks { get; } = 50;
         public List<Task> Tasks = new ();
-        public HashSet<string> Visited = new();
+//        public ILinkStorage Visited = new AList();
+        public ILinkStorage Visited = new AHashSet();
         public Queue<string> Unvisited = new();
 
         public WikiController(string srcUrl, string dstUrl)
@@ -67,8 +68,9 @@ namespace Wiki_Game
 
         public string NextLink()
         {
-            Visited.Add(Unvisited.Peek().ToLower());
-            return Unvisited.Dequeue();
+            string Next = Unvisited.Dequeue();
+            Visited.Add(Next.ToLower());
+            return Next;
         }
 
         public async Task Searcher(string link)
