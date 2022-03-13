@@ -10,11 +10,11 @@ namespace Wiki_Game
             WikiController wc = new(startpage, endpage, AmountOfTasks);
             Stopwatch watch = new();
             watch.Start();
-            string res = wc.Starter().Result;
+            string res = wc.StartSearch();
             watch.Stop();
             string time = watch.Elapsed.TotalSeconds.ToString();
             Console.WriteLine($"Found: {res} from the page {startpage}");
-            Console.WriteLine($"Time elapsed: {time}, amount of tasks: {wc.MaxAmountOfTasks}");
+            Console.WriteLine($"Time elapsed: {time}, amount of tasks: {AmountOfTasks}");
             Console.WriteLine($"Amount of pages visited: {wc.Visited.Count}");
             return watch.Elapsed.Seconds;
         }

@@ -68,7 +68,7 @@ namespace Wiki_Game_Test
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             string end = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
             WikiController wc = new WikiController(start, end, 1);
-            wc.Starter().GetAwaiter().GetResult();
+            wc.StartSearch().GetAwaiter().GetResult();
             Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited >= 1);
             Assert.NotEmpty(wc.Unvisited);
@@ -81,7 +81,7 @@ namespace Wiki_Game_Test
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             string end = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
             WikiController wc = new WikiController(start, end, 50);
-            wc.Starter().GetAwaiter().GetResult();
+            wc.StartSearch().GetAwaiter().GetResult();
             Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited >= 1);
             Assert.NotEmpty(wc.Unvisited);
