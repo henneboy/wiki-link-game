@@ -10,11 +10,9 @@ namespace Wiki_Game
         public static void Main(string[] args)
         {
             string fastEnd = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
-            //string longEnd = "https://en.wikipedia.org/wiki/Kernel_(operating_system)";
-            WikiGame.VisitPage("https://en.wikipedia.org/wiki/C_Sharp_(programming_language)", fastEnd, 16);
-            // https://en.wikipedia.org/wiki/Nintendo
-            // https://en.wikipedia.org/wiki/Free_and_open-source_software
-            // https://en.wikipedia.org/wiki/Video_game
+            string mediumEnd = "https://en.wikipedia.org/wiki/Kernel_(operating_system)";
+            string longEnd = "https://en.wikipedia.org/wiki/Washington_(state)";
+            WikiGame.VisitPage("https://en.wikipedia.org/wiki/C_Sharp_(programming_language)", longEnd, 16);
         }
     }
 }

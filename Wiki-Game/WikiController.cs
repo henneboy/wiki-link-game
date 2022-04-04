@@ -8,6 +8,7 @@ namespace Wiki_Game
     {
         public string SrcUrl { get; }
         public string DstUrl { get; }
+        public string FoundPageURL { get; set; }
         public int AmountOfPagesVisited { get; private set; } = 1;
         private int AmountOfTasks { get; }
         private readonly Task<bool>[] Tasks;
@@ -81,6 +82,7 @@ namespace Wiki_Game
         public bool DoMultiTaskSearch()
         {
             bool result = false;
+            // Start all tasks
             foreach (Task<bool> t in Tasks)
             {
                 t.Start();
@@ -90,6 +92,12 @@ namespace Wiki_Game
                 int IdxOffinishedTask = Task<bool>.WaitAny(Tasks);
                 result = Tasks[IdxOffinishedTask].Result;
                 Tasks[IdxOffinishedTask] = Task<bool>.Run(() => SearchLink(GetNextLink()));
+            }
+            // Dispose of all tasks
+            Task<bool>.WaitAll(Tasks);
+            foreach (Task<bool> t in Tasks)
+            {
+                t.Dispose();
             }
             return true;
         }
@@ -128,6 +136,7 @@ namespace Wiki_Game
                     {
                         if (link.ToLower() == DstUrl)
                         {
+                            FoundPageURL = link;
                             return true;
                         }
                         filteredLinks.Add(link);

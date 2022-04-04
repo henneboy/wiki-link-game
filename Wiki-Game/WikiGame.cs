@@ -24,6 +24,7 @@ namespace Wiki_Game
             Console.WriteLine($"Time elapsed(sec): {time}, amount of tasks: {AmountOfTasks}");
             Console.WriteLine($"Amount of pages visited: {wc.Visited.Count}");
             Console.WriteLine($"Average amount of pages per second: {wc.Visited.Count / watch.Elapsed.TotalSeconds}");
+            Console.WriteLine("The exact url of the destination which was found:" + wc.FoundPageURL);
             return watch.Elapsed.Seconds;
         }
     }
