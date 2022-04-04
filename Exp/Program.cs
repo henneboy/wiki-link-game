@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Exp
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
             string s = "not";
@@ -30,6 +24,7 @@ namespace Exp
             //Thread.Sleep(2000);
             return s;
         }
+
         public static async Task waiter()
         {
             await Task.Run(() =>
