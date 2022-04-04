@@ -28,7 +28,7 @@ namespace Wiki_Game
         /// <summary>
         /// Starts the search for the destionation, this is the only property which should be public.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True when the destination is found</returns>
         public bool StartSearch()
         {
             bool foundDst;
@@ -47,7 +47,7 @@ namespace Wiki_Game
         /// <summary>
         /// Find enough pages to start tasks
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True, if the destination is found</returns>
         public bool SetupSeach()
         {
             Unvisited.Enqueue(SrcUrl);
@@ -64,7 +64,7 @@ namespace Wiki_Game
         /// <summary>
         /// Fill the "Tasks" taskarray with tasks
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the destination is found</returns>
         public bool FillTaskList()
         {
             for (short i = 0; i < AmountOfTasks; i++)
@@ -77,7 +77,7 @@ namespace Wiki_Game
         /// <summary>
         /// Search for the destination using multiple tasks
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True when the destination is found</returns>
         public bool DoMultiTaskSearch()
         {
             bool result = false;
