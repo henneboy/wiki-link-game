@@ -30,7 +30,7 @@ namespace Wiki_Game_Test
             Assert.Contains(@"https://en.wikipedia.org/wiki/Python_(programming_language)", links);
             foreach (var link in links)
             {
-                Assert.NotEmpty(link);
+                Assert.False(String.IsNullOrEmpty(link));
             }
         }
 
@@ -55,9 +55,9 @@ namespace Wiki_Game_Test
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
             WikiController wc = new WikiController(start, end);
-            wc.SearchLink(wc.NextLink());
+            wc.SetupSeach();
             Assert.True(wc.Visited.Contains(start.ToLower()));
-            Assert.True(wc.AmountOfPagesVisited == 1);
+            Assert.True(wc.AmountOfPagesVisited >= 0);
         }
 
         [Fact]
@@ -66,22 +66,22 @@ namespace Wiki_Game_Test
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             string end = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
             WikiController wc = new WikiController(start, end, 1);
-            string result = wc.StartSearch();
+            wc.StartSearch();
             Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited >= 1);
-            Assert.Contains(end, result);
+            Assert.Contains(end.ToLower(), wc.DstUrl);
         }
 
         [Fact]
-        public void Starter_50Tasks_Test()
+        public void Starter_8Tasks_Test()
         {
             string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
             string end = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
-            WikiController wc = new WikiController(start, end, 50);
-            string result = wc.StartSearch();
+            WikiController wc = new WikiController(start, end, 8);
+            wc.StartSearch();
             Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited >= 1);
-            Assert.Contains(end, result);
+            Assert.Contains(end.ToLower(), wc.DstUrl.ToLower());
         }
 
         //[Fact]

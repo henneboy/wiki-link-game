@@ -5,17 +5,25 @@ namespace Wiki_Game
 {
     public static class WikiGame
     {
+        /// <summary>
+        /// Searches through wiki for from the startpage to the endpages and displays information about the search.
+        /// </summary>
+        /// <param name="startpage"></param>
+        /// <param name="endpage"></param>
+        /// <param name="AmountOfTasks">How many tasks may be used for the search (1 if multithreading is wanted)</param>
+        /// <returns>The amount of time (in seconds) it took to find the endpage</returns>
         public static double VisitPage(string startpage, string endpage, int AmountOfTasks)
         {
             WikiController wc = new(startpage, endpage, AmountOfTasks);
             Stopwatch watch = new();
             watch.Start();
-            string res = wc.StartSearch();
+            wc.StartSearch();
             watch.Stop();
             string time = watch.Elapsed.TotalSeconds.ToString();
-            Console.WriteLine($"Found: {res} from the page {startpage}");
-            Console.WriteLine($"Time elapsed: {time}, amount of tasks: {AmountOfTasks}");
+            Console.WriteLine($"Found page: {wc.DstUrl} from start-page: {startpage}");
+            Console.WriteLine($"Time elapsed(sec): {time}, amount of tasks: {AmountOfTasks}");
             Console.WriteLine($"Amount of pages visited: {wc.Visited.Count}");
+            Console.WriteLine($"Average amount of pages per second: {wc.Visited.Count / watch.Elapsed.TotalSeconds}");
             return watch.Elapsed.Seconds;
         }
     }

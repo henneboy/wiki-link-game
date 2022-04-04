@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Wiki_Game
@@ -11,12 +8,11 @@ namespace Wiki_Game
     {
         public string SrcUrl { get; }
         public string DstUrl { get; }
-        public int AmountOfPagesVisited { get; private set; } = 0;
+        public int AmountOfPagesVisited { get; private set; } = 1;
         private int AmountOfTasks { get; }
-        private Task<string>[] Tasks;
-        //        public ILinkStorage Visited = new AList();
+        private readonly Task<bool>[] Tasks;
         public readonly ILinkStorage Visited = new AHashSet();
-        private Queue<string> Unvisited = new();
+        private readonly Queue<string> Unvisited = new();
         private readonly object UnvisitedLock = new object();
 
         public WikiController(string srcUrl, string dstUrl) : this(srcUrl, dstUrl, 1) { }
@@ -26,54 +22,83 @@ namespace Wiki_Game
             SrcUrl = srcUrl;
             DstUrl = dstUrl.ToLower();
             AmountOfTasks = amountOfTasks;
-            Tasks = new Task<string>[AmountOfTasks];
+            Tasks = new Task<bool>[AmountOfTasks];
         }
 
-        public string StartSearch()
+        /// <summary>
+        /// Starts the search for the destionation, this is the only property which should be public.
+        /// </summary>
+        /// <returns></returns>
+        public bool StartSearch()
+        {
+            bool foundDst;
+            foundDst = SetupSeach();
+            if (!foundDst)
+            {
+                FillTaskList();
+            }
+            if (!foundDst)
+            {
+                DoMultiTaskSearch();
+            }
+            return foundDst;
+        }
+
+        /// <summary>
+        /// Find enough pages to start tasks
+        /// </summary>
+        /// <returns></returns>
+        public bool SetupSeach()
         {
             Unvisited.Enqueue(SrcUrl);
-            // Find enough pages, one task at a time
-            while (Unvisited.Count < AmountOfTasks)
+            while (Unvisited.Count <= AmountOfTasks)
             {
-                if (NextInQueueIsDest())
+                if (SearchLink(GetNextLink()))
                 {
-                    return Unvisited.Peek();
+                    return true;
                 }
-                SearchLink(NextLink());
             }
-            return Search();
+            return false;
         }
 
-        public string Search()
-        {
-            string result = FillTaskList();
-            foreach (Task<string> t in Tasks)
-            {
-                t.Start();
-            }
-            while (result == null)
-            {
-                int IdxOffinishedTask = Task<string>.WaitAny(Tasks);
-                result = Tasks[IdxOffinishedTask].Result;
-                Tasks[IdxOffinishedTask] = Task<string>.Run(() => SearchLink(NextLink()));
-            }
-            return result;
-        }
-
-        public string FillTaskList()
+        /// <summary>
+        /// Fill the "Tasks" taskarray with tasks
+        /// </summary>
+        /// <returns></returns>
+        public bool FillTaskList()
         {
             for (short i = 0; i < AmountOfTasks; i++)
             {
-                if (NextInQueueIsDest())
-                {
-                    return Unvisited.Peek();
-                }
-                Tasks[i] = new Task<string>(() => SearchLink(NextLink()));
+                Tasks[i] = new Task<bool>(() => SearchLink(GetNextLink()));
             }
-            return null;
+            return false;
         }
 
-        public string NextLink()
+        /// <summary>
+        /// Search for the destination using multiple tasks
+        /// </summary>
+        /// <returns></returns>
+        public bool DoMultiTaskSearch()
+        {
+            bool result = false;
+            foreach (Task<bool> t in Tasks)
+            {
+                t.Start();
+            }
+            while (!result)
+            {
+                int IdxOffinishedTask = Task<bool>.WaitAny(Tasks);
+                result = Tasks[IdxOffinishedTask].Result;
+                Tasks[IdxOffinishedTask] = Task<bool>.Run(() => SearchLink(GetNextLink()));
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Dequeues a link and adds it to the list of visited links
+        /// </summary>
+        /// <returns>The next link</returns>
+        public string GetNextLink()
         {
             string next;
             lock (UnvisitedLock)
@@ -84,13 +109,12 @@ namespace Wiki_Game
             return next;
         }
 
-        public bool NextInQueueIsDest(){
-            lock (UnvisitedLock) {
-                return Unvisited.Peek().ToLower() == DstUrl;
-            }
-        }
-
-        public string SearchLink(string SearchLink)
+        /// <summary>
+        /// Visits a link and adds them to the queue.
+        /// </summary>
+        /// <param name="SearchLink"></param>
+        /// <returns>True if the destination is found, otherwise false</returns>
+        public bool SearchLink(string SearchLink)
         {
             // With GetContentDiv:
             //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
@@ -102,20 +126,20 @@ namespace Wiki_Game
                 {
                     if (!Visited.Contains(link.ToLower()))
                     {
-                        if (link == DstUrl)
+                        if (link.ToLower() == DstUrl)
                         {
-                            return link;
+                            return true;
                         }
                         filteredLinks.Add(link);
                     }
                 }
-            }
-            lock (UnvisitedLock)
-            {
-                filteredLinks.ForEach(s => Unvisited.Enqueue(s));
+                lock (UnvisitedLock)
+                {
+                    filteredLinks.ForEach(s => Unvisited.Enqueue(s));
+                }
             }
             AmountOfPagesVisited++;
-            return null;
+            return false;
         }
     }
 }
