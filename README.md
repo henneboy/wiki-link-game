@@ -1,5 +1,6 @@
 # Wiki-link-game
 ## The game where you connect two wiki-pages by jumping through other pages
+### Warning: This is my first hobby project...
 
 **Like jumping from [c-sharp](https://en.wikipedia.org/wiki/C_Sharp_(programming_language))**
 **To [Visual Studio Code](https://en.wikipedia.org/wiki/Visual_Studio_Code)**
