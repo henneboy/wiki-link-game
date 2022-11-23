@@ -34,21 +34,6 @@ namespace Wiki_Game_Test
             }
         }
 
-        [Theory]
-        [InlineData("File:")]
-        [InlineData("")]
-        public void ValidLink_WrongInput_Test(string link)
-        {
-            Assert.False(WikiHTML.ValidLink(link));
-        }
-        [Theory]
-        [InlineData("Idk")]
-        [InlineData("C_Sharp_(programming_language)")]
-        public void ValidLink_ValidInput_Test(string link)
-        {
-            Assert.True(WikiHTML.ValidLink(link));
-        }
-
         [Fact]
         public void Searcher_Test()
         {
