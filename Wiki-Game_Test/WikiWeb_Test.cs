@@ -28,6 +28,7 @@ namespace Wiki_Game_Test
             Assert.NotEmpty(links);
             Assert.Contains(@"https://en.wikipedia.org/wiki/.NET_Framework", links);
             Assert.Contains(@"https://en.wikipedia.org/wiki/Python_(programming_language)", links);
+            Assert.Contains(@"https://en.wikipedia.org/wiki/Programming_paradigm", links);
             foreach (var link in links)
             {
                 Assert.False(String.IsNullOrEmpty(link));
@@ -37,10 +38,10 @@ namespace Wiki_Game_Test
         [Fact]
         public void Searcher_Test()
         {
-            string start = "https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
-            string end = "https://en.wikipedia.org/wiki/Programming_paradigm#Support_for_multiple_paradigms";
+            string start = @"https://en.wikipedia.org/wiki/C_Sharp_(programming_language)";
+            string end = @"https://en.wikipedia.org/wiki/Programming_paradigm";
             WikiController wc = new WikiController(start, end);
-            wc.SetupSeach();
+            Assert.True(wc.SetupSeach());
             Assert.True(wc.Visited.Contains(start.ToLower()));
             Assert.True(wc.AmountOfPagesVisited >= 0);
         }

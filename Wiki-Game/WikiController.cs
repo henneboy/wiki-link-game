@@ -32,18 +32,10 @@ namespace Wiki_Game
         /// <returns>True when the destination is found</returns>
         public bool StartSearch()
         {
-            bool foundDst;
-            foundDst = SetupSeach();
-            if (!foundDst)
-            {
-                FillTaskList();
-            }
-            if (!foundDst)
-            {
-                DoMultiTaskSearch();
-            }
-            return foundDst;
-        }
+            if (SetupSeach()) { return true; }
+            if (FillTaskList()) { return true; }
+            return DoMultiTaskSearch();
+		}
 
         /// <summary>
         /// Find enough pages to start tasks
@@ -52,7 +44,7 @@ namespace Wiki_Game
         public bool SetupSeach()
         {
             Unvisited.Enqueue(SrcUrl);
-            while (Unvisited.Count < AmountOfTasks)
+            while (Unvisited.Count <= AmountOfTasks)
             {
                 if (SearchLink(GetNextLink()))
                 {
