@@ -12,7 +12,7 @@ namespace Wiki_Game
         public int AmountOfPagesVisited { get; private set; } = 1;
         private int AmountOfTasks { get; }
         private readonly Task<bool>[] Tasks;
-        public readonly ILinkStorage Visited = new AHashSet();
+        public readonly ILinkStorage Visited = new AHashSet(); // My own class, so I could see the difference between hashset and list.
         private readonly Queue<string> Unvisited = new();
         private readonly object UnvisitedLock = new();
 
