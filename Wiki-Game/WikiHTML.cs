@@ -11,7 +11,7 @@ namespace Wiki_Game
         public static readonly string hrefStr = @"href=""/wiki/";
         public static readonly string WikiLinkPrefix = @"https://en.wikipedia.org/wiki/";
 
-        public static IEnumerable<string> GetLinksFromUrl(string Url) => ParseLinksFromHTML(GetHTMLFromUrl(Url));
+        public static IEnumerable<string> GetOutgoingLinksFromLink(string Url) => ParseLinksFromHTML(GetHTMLFromUrl(Url));
 
         public static string GetHTMLFromUrl(string Url)
         {

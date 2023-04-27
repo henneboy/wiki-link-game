@@ -12,7 +12,7 @@ namespace Wiki_Game
         /// <param name="endpage"></param>
         /// <param name="AmountOfTasks">How many tasks may be used for the search (1 if multithreading is wanted)</param>
         /// <returns>The amount of time (in seconds) it took to find the endpage</returns>
-        public static double VisitPage(string startpage, string endpage, int AmountOfTasks)
+        public static double FindPathOfLinks(string startpage, string endpage, int AmountOfTasks)
         {
             WikiController wc = new(startpage, endpage, AmountOfTasks);
             Stopwatch watch = new();

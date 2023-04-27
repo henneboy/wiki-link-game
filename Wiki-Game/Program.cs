@@ -12,7 +12,7 @@ namespace Wiki_Game
             string fastEnd = "https://en.wikipedia.org/wiki/Roslyn_(compiler)";
             string mediumEnd = "https://en.wikipedia.org/wiki/Kernel_(operating_system)";
             string longEnd = "https://en.wikipedia.org/wiki/Washington_(state)";
-            WikiGame.VisitPage("https://en.wikipedia.org/wiki/C_Sharp_(programming_language)", longEnd, 16);
+            WikiGame.FindPathOfLinks("https://en.wikipedia.org/wiki/C_Sharp_(programming_language)", longEnd, 16);
         }
     }
 }

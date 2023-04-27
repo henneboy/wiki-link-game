@@ -14,7 +14,7 @@ namespace Wiki_Game
         private readonly Task<bool>[] Tasks;
         public readonly ILinkStorage Visited = new AHashSet();
         private readonly Queue<string> Unvisited = new();
-        private readonly object UnvisitedLock = new object();
+        private readonly object UnvisitedLock = new();
 
         public WikiController(string srcUrl, string dstUrl) : this(srcUrl, dstUrl, 1) { }
 
@@ -52,7 +52,7 @@ namespace Wiki_Game
         public bool SetupSeach()
         {
             Unvisited.Enqueue(SrcUrl);
-            while (Unvisited.Count <= AmountOfTasks)
+            while (Unvisited.Count < AmountOfTasks)
             {
                 if (SearchLink(GetNextLink()))
                 {
@@ -126,28 +126,30 @@ namespace Wiki_Game
         {
             // With GetContentDiv:
             //ParseHTMLForLinksAndEnqueue(GetContentDiv(GetHTMLFromUrl(linkStr + unvisited.Dequeue())));
-            string[] links = WikiHTML.GetLinksFromUrl(SearchLink).ToArray();
-            List<string> filteredLinks = new();
-            if (links.Length != 0)
-            {
-                foreach (string link in links)
-                {
-                    if (!Visited.Contains(link.ToLower()))
-                    {
-                        if (link.ToLower() == DstUrl)
-                        {
-                            FoundPageURL = link;
-                            return true;
-                        }
-                        filteredLinks.Add(link);
-                    }
-                }
-                lock (UnvisitedLock)
-                {
-                    filteredLinks.ForEach(s => Unvisited.Enqueue(s));
-                }
-            }
+            string[] links = WikiHTML.GetOutgoingLinksFromLink(SearchLink).ToArray();
             AmountOfPagesVisited++;
+            List<string> unvisitedLinks = new();
+            if (links.Length == 0)
+            {
+                return false;
+            }
+            foreach (string link in links)
+            {
+                if (Visited.Contains(link.ToLower()))
+                {
+                    continue;
+                }
+                if (link.ToLower() == DstUrl)
+                {
+                    FoundPageURL = link;
+                    return true;
+                }
+                unvisitedLinks.Add(link);
+            }
+            lock (UnvisitedLock)
+            {
+                unvisitedLinks.ForEach(s => Unvisited.Enqueue(s));
+            }
             return false;
         }
     }
